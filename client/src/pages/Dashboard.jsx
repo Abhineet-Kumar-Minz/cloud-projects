@@ -159,7 +159,7 @@ export default function Dashboard() {
 
                         <div className="flex items-center justify-between gap-2">
                           <select value={task.status} onChange={e => updateStatus(task._id, e.target.value)}
-                            className="h-8 text-xs rounded-lg bg-white/5 border border-white/10 text-foreground flex-1 px-2 focus:outline-none">
+                            className="h-8 text-xs rounded-lg bg-white/5 border border-white/10 text-foreground flex-1 px-2 focus:outline-none" style={{ colorScheme: 'dark' }}>
                             <option value="todo">Todo</option>
                             <option value="in-progress">In Progress</option>
                             <option value="done">Done</option>
