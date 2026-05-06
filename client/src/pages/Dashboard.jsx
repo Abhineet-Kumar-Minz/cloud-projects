@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, Loader2, ListTodo, Clock, CheckCircle2, LayoutGrid, MessageCircle, LogOut, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Loader2, ListTodo, Clock, CheckCircle2, LayoutGrid, MessageCircle, LogOut, Sparkles, Paperclip } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import API from '../api/axios';
 import useAuthStore from '../store/authStore';
@@ -55,6 +55,21 @@ export default function Dashboard() {
     await API.delete(`/tasks/${id}`);
   };
 
+  const uploadFile = async (taskId, file) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const { data } = await API.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      await API.put(`/tasks/${taskId}`, { fileUrl: data.url });
+      fetchTasks();
+    } catch (err) {
+      console.error('Upload failed:', err);
+    }
+  };
+
   const navItem = (to, label, Icon) => {
     const active = location.pathname === to;
     return (
@@ -69,7 +84,6 @@ export default function Dashboard() {
     <div className="min-h-screen relative">
       <Orbs />
 
-      {/* Topbar */}
       <header className="sticky top-0 z-40 glass-strong border-b border-white/5">
         <div className="container flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2.5 group">
@@ -135,6 +149,14 @@ export default function Dashboard() {
                     items.map(task => (
                       <article key={task._id} className="group glass-strong rounded-xl p-4 animate-scale-in hover:border-white/20 transition-all">
                         <p className="text-sm font-medium leading-snug mb-3">{task.title}</p>
+
+                        {task.fileUrl && (
+                          <a href={task.fileUrl} target="_blank" rel="noreferrer"
+                            className="flex items-center gap-2 text-xs text-primary hover:underline mb-3">
+                            <Paperclip className="h-3 w-3" /> View attachment
+                          </a>
+                        )}
+
                         <div className="flex items-center justify-between gap-2">
                           <select value={task.status} onChange={e => updateStatus(task._id, e.target.value)}
                             className="h-8 text-xs rounded-lg bg-white/5 border border-white/10 text-foreground flex-1 px-2 focus:outline-none">
@@ -142,6 +164,12 @@ export default function Dashboard() {
                             <option value="in-progress">In Progress</option>
                             <option value="done">Done</option>
                           </select>
+
+                          <label className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer transition-all">
+                            <Paperclip className="h-4 w-4" />
+                            <input type="file" className="hidden" onChange={e => uploadFile(task._id, e.target.files[0])} />
+                          </label>
+
                           <button onClick={() => deleteTask(task._id)}
                             className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all">
                             <Trash2 className="h-4 w-4" />

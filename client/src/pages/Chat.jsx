@@ -4,7 +4,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import useAuthStore from '../store/authStore';
 
-const socket = io('http://localhost:5000');
+const SOCKET_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : `http://${window.location.hostname}`;
+
+const socket = io(SOCKET_URL);
 
 const Orbs = () => (
   <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
