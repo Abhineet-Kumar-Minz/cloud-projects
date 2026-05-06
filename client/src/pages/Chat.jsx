@@ -6,9 +6,12 @@ import useAuthStore from '../store/authStore';
 
 const SOCKET_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5000'
-  : `http://${window.location.hostname}`;
+  : window.location.origin;
 
-const socket = io(SOCKET_URL);
+const socket = io(SOCKET_URL, {
+  path: '/socket.io/',
+  transports: ['websocket', 'polling']
+});
 
 const Orbs = () => (
   <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
